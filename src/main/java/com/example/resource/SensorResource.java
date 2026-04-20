@@ -18,7 +18,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 
 /**
@@ -58,8 +60,8 @@ public class SensorResource {
         String roomId = sensor.getRoomId();
 
         if (roomId == null || roomId.trim().isEmpty()) {
-        throw new RuntimeException("Room ID is required.");
-    }
+            throw new WebApplicationException("Room ID is required.", Response.Status.BAD_REQUEST);
+        }
 
         Room room = roomDAO.getById(roomId);
 
@@ -81,7 +83,13 @@ public class SensorResource {
     @Path("/{sensorId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Sensor getSensorById(@PathParam("sensorId") String id) {
-        return sensorDAO.getById(id);
+        Sensor sensor = sensorDAO.getById(id);
+
+        if (sensor == null) {
+            throw new WebApplicationException("Sensor not found", Response.Status.NOT_FOUND);
+        }
+
+        return sensor;
     }
 
     @Path("{sensorId}/readings")
