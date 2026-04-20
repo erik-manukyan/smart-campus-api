@@ -47,7 +47,13 @@ public class RoomResource {
     @Path("/{roomId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Room getRoomById(@PathParam("roomId") String id) {
-        return roomDAO.getById(id);
+        Room room = roomDAO.getById(id);
+
+        if (room == null) {
+            throw new WebApplicationException("Room not found", Response.Status.NOT_FOUND);
+        }
+
+        return room;
     }
 
     @DELETE
